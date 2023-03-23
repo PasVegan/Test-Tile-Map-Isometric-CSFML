@@ -6,4 +6,4 @@ SRCS	=	main_sprite.c
 
 OR
 
-SRCS	= main_vertex
+SRCS	= main_vertex.c
