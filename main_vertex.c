@@ -4,9 +4,10 @@ SFML_DEFINE_DISCRETE_GPU_PREFERENCE
 
 int main(void)
 {
-    sfRenderWindow *window = sfRenderWindow_create((sfVideoMode){1920, 1080,
-                                                                 32}, "RPG",
-                                                   sfResize | sfClose, NULL);
+    sfRenderWindow *window = sfRenderWindow_create((sfVideoMode)
+        {1920, 1080,32}, "RPG",
+        sfResize | sfClose, NULL);
+    sfRenderWindow_setFramerateLimit(window, 60);
     sfEvent evt;
     sfTexture *texture = sfTexture_createFromFile("isometric_0053.png", NULL);
     const float scale_x = 0.1483198146f;
@@ -15,18 +16,21 @@ int main(void)
     const unsigned tileh = sfTexture_getSize(texture).y;
     const int half_tilew = sfTexture_getSize(texture).x * 0.5 * scale_x;
     const int half_tileh = sfTexture_getSize(texture).y * 0.5 * scale_y;
-
+    const int half_screen = 1920 / 2;
+    const int map_size = 10;
     sfVertexArray *vertexArray = sfVertexArray_create();
-    sfVertexArray_setPrimitiveType(vertexArray, sfQuads);
-    sfVertexArray_resize(vertexArray, tileh * tilew * 4);
 
-    for (int i = 0; i < 10; i++) {
-        for (int j = 0; j < 10; j++) {
-            float x = (i - j) * half_tilew - half_tilew;
+
+    sfVertexArray_setPrimitiveType(vertexArray, sfQuads);
+    sfVertexArray_resize(vertexArray, (map_size * map_size) * 4);
+
+    for (int i = 0; i < map_size; i++) {
+        for (int j = 0; j < map_size; j++) {
+            float x = (i - j) * half_tilew - half_tilew + half_screen;
             float y = (i + j) * half_tileh * 0.5;
 
-            sfVertex *vertex = sfVertexArray_getVertex(vertexArray, (i + j *
-            10) * 4);
+            sfVertex *vertex =
+                sfVertexArray_getVertex(vertexArray, (i + j * 10) * 4);
 
             vertex[0].position = (sfVector2f){x, y};
             vertex[1].position = (sfVector2f){x + tilew, y};
@@ -43,8 +47,7 @@ int main(void)
     sfRenderStates state; state.shader = NULL;
     state.texture = texture;
     state.transform = sfTransform_Identity;
-//    sfTransform_scale(&state.transform, scale_x, scale_y);
-    sfRenderWindow_setFramerateLimit(window, 60);
+    sfTransform_scale(&state.transform, scale_x, scale_y);
 
     while (sfRenderWindow_isOpen(window)) {
         while (sfRenderWindow_pollEvent(window, &evt)) {
@@ -57,4 +60,6 @@ int main(void)
     }
 
     sfVertexArray_destroy(vertexArray);
+
+    return 0;
 }
